@@ -1,26 +1,21 @@
-module DayOne (dayOnePartOne, dayOnePartTwo) where
+module DayOne (partA, partB) where
 
-import Data.List as L
-import Text.Read as R
-import Data.Maybe as M
-import Data.Text as T
-import Data.Ord as O
+import Data.List (maximum, sum, take, sortOn)
+import Text.Read (readMaybe)
+import Data.Maybe (mapMaybe)
+import Data.Text as T (lines, splitOn, unpack, pack)
+import Data.Ord (Down(Down))
 
-type Input = T.Text
-type Output = Int
-
-caloriesOfElves :: Input -> [Output]
-caloriesOfElves x = sum . M.mapMaybe convertToInt . T.lines <$> splitByElf x
+caloriesOfElves :: String -> [Int]
+caloriesOfElves x = map (sum . convertToInt) parsedCalories
     where
-        splitByElf = splitOn (pack "\n\n")
-        convertToInt y = R.readMaybe $ T.unpack y :: Maybe Int
+        convertToInt = mapMaybe (readMaybe . unpack)
+        parsedCalories = T.lines <$> splitOn (pack "\n\n") (pack x)
 
-highestCalories :: Input -> Output
-highestCalories x = L.maximum $ caloriesOfElves x
+partA :: String -> Int
+partA x = maximum $ caloriesOfElves x
 
 -- use sortOn Down to avoid having to reverse the list
-sumOfTopThreeCalories :: Input -> Output
-sumOfTopThreeCalories x = L.sum $ L.take 3 $ L.sortOn O.Down $ caloriesOfElves x
+partB :: String -> Int
+partB x = sum $ take 3 $ sortOn Down $ caloriesOfElves x
 
-dayOnePartOne = highestCalories
-dayOnePartTwo = sumOfTopThreeCalories
